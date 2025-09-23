@@ -34,7 +34,7 @@ function extractUnusableEmojis(messageString: string, size: number) {
             // Replace the discord emoji format with the corresponding emoji url
             messageString = messageString.replace(
                 emojiString[0],
-                `[${emoji.allNamesString.replace(":", "")}](https://cdn.discordapp.com/emojis/${emoji.id}.webp?size=48${emoji.animated ? "&animated=true" : ""})`
+                `[:${emoji.name}:](https://cdn.discordapp.com/emojis/${emoji.id}.webp?size=48${emoji.animated ? "&animated=true" : ""})`
             );
         }
     }
