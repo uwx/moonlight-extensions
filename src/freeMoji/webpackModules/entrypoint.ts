@@ -4,19 +4,31 @@ import spacepack from "@moonlight-mod/wp/spacepack_spacepack";
 const logger = moonlight.getLogger("freeMoji/entrypoint");
 logger.info("Hello from freeMoji/entrypoint!");
 
-interface Message {
-    content: string;
-    // TODO: Get the proper type for this
-    invalidEmojis: any[];
+interface Emoji {
+    id: string;
+    guildId: string;
+    animated: boolean;
+    available: boolean;
+    type: number;
+    name: string;
+    // note: many attributes omitted as not relevant
 }
 
-const COOL = "Queueing message to be sent";
-const module = spacepack.findByCode(COOL)[0].exports;
+interface Message {
+    content: string;
+    invalidEmojis: Emoji[];
+    tts: boolean;
+    validNonShortcutEmojis: Emoji[];
+}
 
-const originalSend = module.Z.sendMessage;
-module.Z.sendMessage = async (...args: any[]) => {
+let module = spacepack.findByCode("Queueing message to be sent")[0].exports;
+module = module[Object.getOwnPropertyNames(module)[0]];
+
+const originalSend = module.sendMessage;
+module.sendMessage = async (...args: any[]) => {
+    logger.trace("sendMessage called with", args);
     modifyIfNeeded(args[1]);
-    return originalSend.call(module.Z, ...args);
+    return originalSend.call(module, ...args);
 };
 
 // https://github.com/luimu64/nitro-spoof/blob/1bb75a2471c39669d590bfbabeb7b922672929f5/index.js#L25
@@ -27,14 +39,14 @@ function extractUnusableEmojis(messageString: string, size: number) {
 
     for (const emojiString of emojiStrings) {
         // Fetch required info about the emoji
-        const emoji = EmojiStore.getCustomEmojiById(emojiString[2]);
+        const emoji: Emoji = EmojiStore.getCustomEmojiById(emojiString[2]);
 
         // Check emoji usability
         if (emoji.guildId !== SelectedGuildStore.getGuildId() || emoji.animated) {
             // Replace the discord emoji format with the corresponding emoji url
             messageString = messageString.replace(
                 emojiString[0],
-                `[:${emoji.name}:](https://cdn.discordapp.com/emojis/${emoji.id}.webp?size=48${emoji.animated ? "&animated=true" : ""})`
+                `[:${emoji.name}:](https://cdn.discordapp.com/emojis/${emoji.id}.webp?size=${size}${emoji.animated ? "&animated=true" : ""})`
             );
         }
     }
