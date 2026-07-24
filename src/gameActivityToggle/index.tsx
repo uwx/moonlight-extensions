@@ -5,8 +5,8 @@ export const patches: ExtensionWebExports["patches"] = [
     {
         find: "shouldShowSpeakingWhileMutedTooltip",
         replace: {
-            match: /className:\i\.buttons,.{0,50}children:\[/,
-            replacement: "$&require('gameActivityToggle_entrypoint').GameActivityToggleButton(),"
+            match: /children:\[(?=.{0,25}?accountContainerRef)/,
+            replacement: "$&require('gameActivityToggle_entrypoint').GameActivityToggleButton(arguments[0]),"
         }
     }
 ];
@@ -14,15 +14,15 @@ export const patches: ExtensionWebExports["patches"] = [
 export const webpackModules: ExtensionWebExports["webpackModules"] = {
     entrypoint: {
         dependencies: [
-            'react',
+            "react",
             {
-                ext: 'spacepack',
-                id: 'spacepack',
+                ext: "spacepack",
+                id: "spacepack"
             },
             {
-                ext: 'common',
-                id: 'ErrorBoundary',
+                ext: "common",
+                id: "ErrorBoundary"
             }
-        ],
+        ]
     }
 };
