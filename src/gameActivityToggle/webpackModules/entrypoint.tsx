@@ -1,9 +1,7 @@
 import React from '@moonlight-mod/wp/react';
-import { spacepack } from '@moonlight-mod/wp/spacepack_spacepack';
 import { ShowCurrentGame } from '@moonlight-mod/wp/discord/modules/user_settings/UserSettings';
 import ErrorBoundary from '@moonlight-mod/wp/common_ErrorBoundary';
-
-const Button = spacepack.findByCode(".NONE,disabled:", ".PANEL_BUTTON")[0].exports.Z;
+import PanelButton from '@moonlight-mod/wp/discord/components/common/PanelButton';
 
 function makeIcon(showCurrentGame?: boolean) {
     const oldIcon = false;
@@ -34,23 +32,24 @@ function makeIcon(showCurrentGame?: boolean) {
     );
 }
 
-export function GameActivityToggleButtonInternal() {
+export function GameActivityToggleButtonInternal(props: { nameplate?: any; }) {
     const showCurrentGame = ShowCurrentGame.useSetting();
 
     return (
-        <Button
+       <PanelButton
             tooltipText={showCurrentGame ? "Disable Game Activity" : "Enable Game Activity"}
             icon={makeIcon(showCurrentGame)}
             role="switch"
             aria-checked={!showCurrentGame}
             redGlow={!showCurrentGame}
-            onClick={() => ShowCurrentGame.updateSetting(!showCurrentGame)}
+            plated={props?.nameplate != null}
+            onClick={() => ShowCurrentGame.updateSetting((old) => !old)}
         />
     );
 }
 
-export function GameActivityToggleButton() {
+export function GameActivityToggleButton(props: { nameplate?: any; }) {
     return <ErrorBoundary>
-        <GameActivityToggleButtonInternal />
+        <GameActivityToggleButtonInternal {...props}/>
     </ErrorBoundary>
 }
